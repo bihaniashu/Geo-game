@@ -8,9 +8,9 @@
   * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
   body { background: #0f172a; color: #f8fafc; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
   
-  /* Top Panel: Mission Data & Interactive Questions (Scrollable if needed) */
+  /* Top Panel: Dominant Photo, Mission Brief, and Options */
   #top-panel {
-    flex: 0 0 52%;
+    flex: 0 0 74%;
     padding: 12px 14px;
     background: #1e293b;
     border-bottom: 2px solid #334155;
@@ -22,14 +22,30 @@
   
   .score-board { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; }
   
-  .mission-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .animal-avatar { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #475569; }
-  .header-text { flex: 1; }
+  .mission-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
   .badge { display: inline-block; background: #22c55e; color: #052e16; padding: 2px 8px; border-radius: 12px; font-weight: 800; font-size: 10px; }
-  .animal-title { font-size: 16px; font-weight: 700; color: #f8fafc; margin-top: 2px; }
+  .animal-title { font-size: 17px; font-weight: 700; color: #f8fafc; margin-top: 2px; }
 
-  .clue-box { background: #0f172a; border-left: 3px solid #38bdf8; padding: 8px 10px; border-radius: 6px; font-size: 12.5px; line-height: 1.35; color: #cbd5e1; margin-bottom: 8px; }
-  .question-label { font-size: 13px; font-weight: 700; color: #38bdf8; margin-bottom: 6px; }
+  /* Large Featured Animal Photo */
+  .large-photo-box {
+    width: 100%;
+    height: 155px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #0f172a;
+    border: 1px solid #475569;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .large-photo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .clue-box { background: #0f172a; border-left: 3px solid #38bdf8; padding: 8px 10px; border-radius: 6px; font-size: 12px; line-height: 1.35; color: #cbd5e1; margin-bottom: 8px; }
+  .question-label { font-size: 12.5px; font-weight: 700; color: #38bdf8; margin-bottom: 6px; }
 
   .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   button.opt-btn { background: #334155; border: 1.5px solid transparent; color: white; padding: 9px 6px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.15s; }
@@ -39,7 +55,7 @@
 
   #next-btn { background: #38bdf8; color: #0f172a; font-weight: 800; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 8px; font-size: 14px; cursor: pointer; display: none; }
 
-  /* Bottom Panel: Full Screen Map */
+  /* Compact Bottom Map Panel */
   #bottom-map-panel {
     flex: 1;
     position: relative;
@@ -54,15 +70,15 @@
 
   .map-country-badge {
     position: absolute;
-    top: 10px;
-    left: 12px;
+    top: 8px;
+    left: 10px;
     background: rgba(15, 23, 42, 0.92);
     color: #38bdf8;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
-    padding: 5px 10px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    padding: 4px 8px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     border: 1px solid rgba(56, 189, 248, 0.4);
     z-index: 10;
     pointer-events: none;
@@ -71,23 +87,25 @@
 </head>
 <body>
 
-  <!-- Top Dashboard -->
   <div id="top-panel">
     <div>
       <div class="score-board">
         <span>🐾 Rescues: <b id="score" style="color:#38bdf8">0</b></span>
-        <span>Mission: <b id="round-tracker">1/4</b></span>
+        <span>Mission: <b id="round-tracker">1/20</b></span>
       </div>
 
       <div class="mission-header">
-        <img id="animal-img" class="animal-avatar" src="" alt="Animal">
-        <div class="header-text">
+        <div>
           <div class="badge">URGENT SOS</div>
-          <div class="animal-title" id="animal-name">Animal Name</div>
+          <div class="animal-title" id="animal-name">Loading Mission...</div>
         </div>
       </div>
 
-      <div class="clue-box" id="mission-clue">Mission Clue</div>
+      <div class="large-photo-box">
+        <img id="animal-img" src="" alt="Wild Animal">
+      </div>
+
+      <div class="clue-box" id="mission-clue">Loading Clue...</div>
     </div>
 
     <div>
@@ -97,72 +115,305 @@
     </div>
   </div>
 
-  <!-- Bottom Full-Width Map -->
   <div id="bottom-map-panel">
     <div class="map-country-badge" id="country-tag">📍 Target Country</div>
     <iframe id="map-frame" src="" loading="lazy"></iframe>
   </div>
 
 <script>
-const missions = [
+const missionsDatabase = [
   {
     name: "Snow Leopard",
-    country: "Nepal / India / China",
-    photo: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=600&q=80",
-    mapEmbed: "https://maps.google.com/maps?q=Himalayas,Nepal&t=k&z=5&ie=UTF8&iwloc=&output=embed",
-    clue: "Stranded across high-altitude mountain passes in <b>Nepal</b>, <b>India</b>, and <b>China</b>.",
-    locationQ: "Identify the mountain biome:",
+    country: "Nepal & India",
+    photo: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Himalayas,Nepal&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Stranded across high-altitude mountain passes in <b>Nepal</b> and <b>India</b>.",
+    locationQ: "Identify the mountain range:",
     locations: ["Himalayas", "Andes", "Alps", "Rockies"],
     correctLoc: 0,
-    gearQ: "Pack proper gear for sub-zero peaks:",
-    gear: ["Thermal Parka & Crampons", "Scuba Fins & Tank", "Desert Sun Hat", "Jungle Machete"],
+    gearQ: "Pack gear for sub-zero peaks:",
+    gear: ["Thermal Parka & Crampons", "Scuba Mask", "Desert Hat", "Jungle Machete"],
     correctGear: 0,
-    fact: "Mission Success! The Himalayas contain Mount Everest and span across 5 Asian nations."
+    fact: "The Himalayas hold Mount Everest and stretch across 5 Asian countries."
   },
   {
     name: "Ring-Tailed Lemur",
     country: "Madagascar",
-    photo: "https://images.unsplash.com/photo-1579613832125-5d34a13ffe0a?auto=format&fit=crop&w=600&q=80",
-    mapEmbed: "https://maps.google.com/maps?q=Madagascar&t=m&z=5&ie=UTF8&iwloc=&output=embed",
-    clue: "Trapped in dry spiny forests on the island country of <b>Madagascar</b> off East Africa.",
+    photo: "https://images.unsplash.com/photo-1579613832125-5d34a13ffe0a?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Madagascar&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Trapped in spiny forests on the island country of <b>Madagascar</b> off East Africa.",
     locationQ: "Target the destination:",
     locations: ["Madagascar", "Greenland", "Sri Lanka", "New Zealand"],
     correctLoc: 0,
     gearQ: "Select safari expedition essential:",
-    gear: ["Bug Spray & Light Boots", "Heavy Snow Goggles", "Fur Winter Coat", "Ice Pick"],
+    gear: ["Bug Spray & Light Boots", "Heavy Snow Goggles", "Fur Parka", "Ice Pick"],
     correctGear: 0,
-    fact: "Awesome! Madagascar is an island nation where 90% of all wildlife exists nowhere else on Earth."
+    fact: "Madagascar is the world's 4th largest island; over 90% of its wildlife is unique."
   },
   {
     name: "Galápagos Penguin",
     country: "Ecuador",
-    photo: "https://images.unsplash.com/photo-1598439210625-5067c578f3f6?auto=format&fit=crop&w=600&q=80",
-    mapEmbed: "https://maps.google.com/maps?q=Galapagos+Islands,Ecuador&t=m&z=6&ie=UTF8&iwloc=&output=embed",
-    clue: "Living on volcanic ocean islands governed by <b>Ecuador</b>, directly on the Equator.",
+    photo: "https://images.unsplash.com/photo-1598439210625-5067c578f3f6?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Galapagos+Islands,Ecuador&t=m&z=4&ie=UTF8&iwloc=&output=embed",
+    clue: "Living on volcanic islands governed by <b>Ecuador</b>, right on the Equator.",
     locationQ: "Pinpoint the archipelago:",
     locations: ["Galápagos Islands", "Hawaii", "Iceland", "Maldives"],
     correctLoc: 0,
-    gearQ: "Gear needed for equatorial reef rescue:",
-    gear: ["Snorkel & Reef Boots", "Snowmobile", "Sand Gaiters", "Down Jacket"],
+    gearQ: "Gear needed for marine reef rescue:",
+    gear: ["Snorkel & Reef Boots", "Snowmobile", "Sand Gaiters", "Down Parka"],
     correctGear: 0,
-    fact: "Brilliant! The Galápagos Islands belong to Ecuador and are home to the only penguin native north of the Equator."
+    fact: "The Galápagos is home to the only wild penguin species north of the Equator."
   },
   {
     name: "Jaguar",
     country: "Brazil",
-    photo: "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=600&q=80",
-    mapEmbed: "https://maps.google.com/maps?q=Amazon+Rainforest,Brazil&t=k&z=5&ie=UTF8&iwloc=&output=embed",
-    clue: "Hiding deep in the tropical rainforest of <b>Brazil</b> along the world's largest river basin.",
+    photo: "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Amazon+Rainforest,Brazil&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Hiding in the tropical rainforest of <b>Brazil</b> along the world's largest river basin.",
     locationQ: "Select the river basin:",
     locations: ["Amazon Basin", "Nile River", "Danube River", "Yangtze River"],
     correctLoc: 0,
     gearQ: "Choose river expedition gear:",
     gear: ["Waterproof Raft & Compass", "Ice Sled", "Snowshoes", "Camel Saddle"],
     correctGear: 0,
-    fact: "Great rescue! The Amazon Basin covers roughly 40% of South America, with the largest portion located in Brazil."
+    fact: "The Amazon Basin covers 40% of South America, primarily across Brazil."
+  },
+  {
+    name: "Giant Panda",
+    country: "China",
+    photo: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef6?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Sichuan,China&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Munching bamboo in the Sichuan mountain valleys of <b>China</b>.",
+    locationQ: "Identify the country:",
+    locations: ["China", "India", "Mongolia", "Thailand"],
+    correctLoc: 0,
+    gearQ: "Pack forest climbing gear:",
+    gear: ["Trekking Poles & Raincoat", "Scuba Tank", "Desert Turban", "Crampons"],
+    correctGear: 0,
+    fact: "Giant pandas eat up to 38 kg of bamboo every day in the misty Chinese mountains."
+  },
+  {
+    name: "Kangaroo",
+    country: "Australia",
+    photo: "https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Outback,Australia&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Bounding across the vast desert Outback of <b>Australia</b>.",
+    locationQ: "Identify the continent / nation:",
+    locations: ["Australia", "Africa", "Europe", "Antarctica"],
+    correctLoc: 0,
+    gearQ: "Pack for extreme Outback heat:",
+    gear: ["Wide-Brim Sunhat & Hydration Pack", "Heavy Fur Mittens", "Ice Axe", "Drysuit"],
+    correctGear: 0,
+    fact: "Australia is the only continent covered entirely by a single country."
+  },
+  {
+    name: "Polar Bear",
+    country: "Norway / Svalbard",
+    photo: "https://images.unsplash.com/photo-1589656966895-2f33e7653819?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Svalbard,Norway&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Prowling sea ice near the Svalbard archipelago belonging to <b>Norway</b>.",
+    locationQ: "Identify the Arctic region:",
+    locations: ["Arctic Ocean / Svalbard", "Sahara", "Amazon", "Gobi Desert"],
+    correctLoc: 0,
+    gearQ: "Prepare sub-zero survival gear:",
+    gear: ["Arctic Heavy Parka & Spikes", "Shorts & T-Shirt", "Swim Trunks", "Sun Umbrella"],
+    correctGear: 0,
+    fact: "Svalbard, Norway has more polar bears than human residents."
+  },
+  {
+    name: "Bengal Tiger",
+    country: "India & Bangladesh",
+    photo: "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Sundarbans,India&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Swimming through the Sundarbans mangrove forests of <b>India</b> and <b>Bangladesh</b>.",
+    locationQ: "Name the mangrove forest:",
+    locations: ["Sundarbans", "Black Forest", "Taiga", "Congo Basin"],
+    correctLoc: 0,
+    gearQ: "Mangrove swamp gear needed:",
+    gear: ["High Mud Boots & Life Jacket", "Snow Skis", "Winter Beanie", "Snowshoes"],
+    correctGear: 0,
+    fact: "The Sundarbans is the world's largest coastal mangrove ecosystem."
+  },
+  {
+    name: "African Elephant",
+    country: "Kenya & Tanzania",
+    photo: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Serengeti,Tanzania&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Migrating across the Serengeti plains between <b>Kenya</b> and <b>Tanzania</b>.",
+    locationQ: "Identify the African biome:",
+    locations: ["Savanna", "Tundra", "Taiga", "Glacier"],
+    correctLoc: 0,
+    gearQ: "Safari expedition essential:",
+    gear: ["Dust Goggles & Field Binoculars", "Ice Pick", "Heavy Thermal Coat", "Flippers"],
+    correctGear: 0,
+    fact: "The Serengeti hosts the largest terrestrial mammal migration in the world."
+  },
+  {
+    name: "Mountain Gorilla",
+    country: "Rwanda & Uganda",
+    photo: "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Virunga+Mountains,Rwanda&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Dwelling in the misty Virunga volcanic slopes in <b>Rwanda</b> and <b>Uganda</b>.",
+    locationQ: "Target the region:",
+    locations: ["Virunga Mountains", "Atlas Mountains", "Urals", "Appalachians"],
+    correctLoc: 0,
+    gearQ: "Cloud forest expedition gear:",
+    gear: ["Gaiters & Thick Gardening Gloves", "Snorkel Mask", "Sand Skis", "Ice Crampons"],
+    correctGear: 0,
+    fact: "Mountain gorillas live only in high-altitude volcanic cloud forests."
+  },
+  {
+    name: "Platypus",
+    country: "Australia (Tasmania)",
+    photo: "https://images.unsplash.com/photo-1582298538104-fe2e74c27f59?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Tasmania,Australia&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Diving in freshwater creeks on the island state of Tasmania in <b>Australia</b>.",
+    locationQ: "Identify the island:",
+    locations: ["Tasmania", "Iceland", "Sicily", "Borneo"],
+    correctLoc: 0,
+    gearQ: "Freshwater stream gear:",
+    gear: ["Waders & Polarized Sunglasses", "Desert Veil", "Snowboard", "Parka"],
+    correctGear: 0,
+    fact: "The platypus is one of only two egg-laying mammals (monotremes) on Earth."
+  },
+  {
+    name: "Emperor Penguin",
+    country: "Antarctica",
+    photo: "https://images.unsplash.com/photo-1517783999520-f068d7431a60?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Antarctica&t=m&z=2&ie=UTF8&iwloc=&output=embed",
+    clue: "Surviving the brutal winter storms on the ice shelves of <b>Antarctica</b>.",
+    locationQ: "Identify the continent:",
+    locations: ["Antarctica", "Europe", "Asia", "South America"],
+    correctLoc: 0,
+    gearQ: "Extreme polar survival gear:",
+    gear: ["Thermal Balaclava & Windproof Suit", "Swimwear", "Safari Shorts", "Sandals"],
+    correctGear: 0,
+    fact: "Antarctica is the coldest, driest, and windiest continent on Earth."
+  },
+  {
+    name: "Moose",
+    country: "Canada",
+    photo: "https://images.unsplash.com/photo-1549480017-d76466a4b7e8?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Banff,Canada&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Wading in glacial lakes inside the Rocky Mountains of <b>Canada</b>.",
+    locationQ: "Identify the country:",
+    locations: ["Canada", "Mexico", "Egypt", "Spain"],
+    correctLoc: 0,
+    gearQ: "Northwoods pack essential:",
+    gear: ["Bear Spray & Insulated Boots", "Desert Scarf", "Scuba Fins", "Sun Umbrella"],
+    correctGear: 0,
+    fact: "Canada has the longest coastline in the world, stretching over 202,000 km."
+  },
+  {
+    name: "Capybara",
+    country: "Argentina & Paraguay",
+    photo: "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Pantanal,Paraguay&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Lazing in the wetlands connecting <b>Argentina</b>, <b>Brazil</b>, and <b>Paraguay</b>.",
+    locationQ: "Identify the wetland system:",
+    locations: ["Pantanal", "Everglades", "Okavango", "Llanos"],
+    correctLoc: 0,
+    gearQ: "Wetland crossing gear:",
+    gear: ["Inflatable Kayak & Bug Net", "Snowmobile", "Heavy Winter Coat", "Ice Cleats"],
+    correctGear: 0,
+    fact: "The Pantanal is the largest tropical wetland area in the world."
+  },
+  {
+    name: "Orangutan",
+    country: "Indonesia & Malaysia",
+    photo: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Borneo&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Swinging through rainforest canopies on the island of Borneo in <b>Indonesia</b>.",
+    locationQ: "Identify the tropical island:",
+    locations: ["Borneo", "Greenland", "Cuba", "Great Britain"],
+    correctLoc: 0,
+    gearQ: "Rainforest canopy gear:",
+    gear: ["Climbing Harness & Waterproof Pouch", "Thermal Snow Pants", "Snow Goggles", "Fur Mitts"],
+    correctGear: 0,
+    fact: "Borneo is shared by 3 nations: Indonesia, Malaysia, and Brunei."
+  },
+  {
+    name: "Red Fox",
+    country: "United Kingdom & Europe",
+    photo: "https://images.unsplash.com/photo-1516934024742-b461fba47600?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=United+Kingdom&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Foraging through meadows and woodlands across the <b>United Kingdom</b>.",
+    locationQ: "Identify the island nation:",
+    locations: ["United Kingdom", "Japan", "New Zealand", "Iceland"],
+    correctLoc: 0,
+    gearQ: "Misty woodland pack:",
+    gear: ["Waterproof Mackintosh & Map", "Desert Sun-veil", "Diving Tank", "Alpine Ice Axe"],
+    correctGear: 0,
+    fact: "The UK is an island nation consisting of England, Scotland, Wales, and Northern Ireland."
+  },
+  {
+    name: "Arabian Oryx",
+    country: "Oman & UAE",
+    photo: "https://images.unsplash.com/photo-1547970810-dc1eac8161a7?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Rub+al+Khali,Oman&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Surviving the Rub' al Khali (Empty Quarter) desert spanning <b>Oman</b> and <b>UAE</b>.",
+    locationQ: "Identify the desert region:",
+    locations: ["Arabian Desert", "Gobi Desert", "Atacama Desert", "Mojave Desert"],
+    correctLoc: 0,
+    gearQ: "Dune expedition gear:",
+    gear: ["Sand Goggles & Water Canteen", "Ice Pick", "Snowsuit", "Scuba Flippers"],
+    correctGear: 0,
+    fact: "The Rub' al Khali is the world's largest contiguous sand desert."
+  },
+  {
+    name: "Llama",
+    country: "Peru & Bolivia",
+    photo: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Cusco,Peru&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Grazing high in the Altiplano mountains in <b>Peru</b> and <b>Bolivia</b>.",
+    locationQ: "Identify the mountain chain:",
+    locations: ["Andes Mountains", "Himalayas", "Urals", "Pyrenees"],
+    correctLoc: 0,
+    gearQ: "High-altitude plateau gear:",
+    gear: ["Windproof Poncho & Oxygen Meter", "Snorkel Mask", "Sand Board", "Tropical Fins"],
+    correctGear: 0,
+    fact: "The Andes form the longest continental mountain range on the planet."
+  },
+  {
+    name: "Koala",
+    country: "Australia",
+    photo: "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Queensland,Australia&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    clue: "Sleeping in eucalyptus tree canopies along coastal <b>Eastern Australia</b>.",
+    locationQ: "Identify the country:",
+    locations: ["Australia", "India", "South Africa", "Brazil"],
+    correctLoc: 0,
+    gearQ: "Tree canopy inspection gear:",
+    gear: ["Tree Climbing Ropes & Sunscreen", "Heavy Snow Parker", "Ice Pick", "Scuba Tank"],
+    correctGear: 0,
+    fact: "Koalas sleep up to 20 hours a day because eucalyptus leaves require lots of energy to digest."
+  },
+  {
+    name: "Beluga Whale",
+    country: "Greenland & Arctic",
+    photo: "https://images.unsplash.com/photo-1568430462989-44163eb1752f?auto=format&fit=crop&w=800&q=80",
+    mapEmbed: "https://maps.google.com/maps?q=Greenland&t=m&z=2&ie=UTF8&iwloc=&output=embed",
+    clue: "Navigating ice channels off the coast of <b>Greenland</b> in Arctic waters.",
+    locationQ: "Identify the territory:",
+    locations: ["Greenland", "Madagascar", "Hawaii", "Cuba"],
+    correctLoc: 0,
+    gearQ: "Polar marine rescue gear:",
+    gear: ["Immersion Drysuit & Sonar Beacon", "Desert Sand Gaiters", "Safari Sunhat", "Camel Saddle"],
+    correctGear: 0,
+    fact: "Greenland is the world's largest island that is not classified as a continent."
   }
 ];
 
+// Shuffle algorithm (Fisher-Yates) for random gameplay
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+let missions = shuffle([...missionsDatabase]);
 let currentIdx = 0;
 let step = 0;
 let score = 0;
@@ -211,7 +462,7 @@ function checkAnswer(chosen, correct, btn) {
   buttons.forEach(b => b.disabled = true);
   if (chosen === correct) {
     btn.classList.add("correct");
-    setTimeout(() => { step = 1; renderStep(); }, 600);
+    setTimeout(() => { step = 1; renderStep(); }, 500);
   } else {
     btn.classList.add("wrong");
     buttons[correct].classList.add("correct");
@@ -240,11 +491,11 @@ function nextQuestion() {
     loadMission();
   } else {
     document.getElementById("top-panel").innerHTML = `
-      <div style="text-align:center; padding: 24px 10px;">
-        <div style="font-size: 48px; margin-bottom:8px;">🏆</div>
-        <h2 style="margin:0 0 6px;">Master Explorer!</h2>
-        <p style="color:#cbd5e1; font-size:13px;">All wildlife rescued successfully across the globe!</p>
-        <p style="font-size:16px; margin: 12px 0;">Final Score: <b style="color:#22c55e">${score} pts</b></p>
+      <div style="text-align:center; padding: 30px 10px;">
+        <div style="font-size: 52px; margin-bottom:10px;">🏆</div>
+        <h2 style="margin:0 0 8px;">Legendary Explorer!</h2>
+        <p style="color:#cbd5e1; font-size:13px;">You successfully completed all 20 global rescue missions!</p>
+        <p style="font-size:18px; margin: 16px 0;">Final Score: <b style="color:#22c55e">${score} pts</b></p>
         <button class="opt-btn" onclick="location.reload()" style="width:100%; background:#38bdf8; color:#0f172a; font-weight:800; font-size:14px; padding:12px;">Play Again 🔄</button>
       </div>`;
   }
