@@ -8,54 +8,70 @@
   * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
   body { background: #0f172a; color: #f8fafc; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
   
-  /* Top Panel: Compact Spacing & Large Accurate Photo */
+  /* Compact Top Dashboard - Strictly sized to eliminate dead space */
   #top-panel {
-    flex: 0 0 76%;
-    padding: 8px 12px;
+    flex: 0 0 auto;
+    padding: 8px 10px;
     background: #1e293b;
     border-bottom: 2px solid #334155;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow-y: auto;
+    z-index: 10;
   }
   
-  .score-board { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 4px; }
-  
-  .mission-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-  .badge { display: inline-block; background: #22c55e; color: #052e16; padding: 2px 7px; border-radius: 10px; font-weight: 800; font-size: 10px; }
-  .animal-title { font-size: 15px; font-weight: 700; color: #f8fafc; }
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 6px;
+  }
+  .badge { background: #22c55e; color: #052e16; padding: 1px 6px; border-radius: 8px; font-weight: 800; font-size: 9px; }
 
-  /* Larger, dominant photo container with tight margins */
-  .large-photo-box {
-    width: 100%;
-    height: 180px;
-    border-radius: 8px;
+  /* Side-by-Side Compact Mission Card */
+  .mission-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  
+  .photo-container {
+    width: 110px;
+    height: 95px;
+    border-radius: 6px;
     overflow: hidden;
     background: #020617;
     border: 1px solid #475569;
-    margin-bottom: 5px;
     flex-shrink: 0;
   }
-  .large-photo-box img {
+  .photo-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
   }
 
-  .clue-box { background: #0f172a; border-left: 3px solid #38bdf8; padding: 5px 8px; border-radius: 5px; font-size: 11.5px; line-height: 1.3; color: #cbd5e1; margin-bottom: 5px; }
-  .question-label { font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 4px; }
+  .details-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .animal-title { font-size: 14px; font-weight: 800; color: #f8fafc; }
+  .clue-box { background: #0f172a; border-left: 3px solid #38bdf8; padding: 4px 6px; border-radius: 4px; font-size: 11px; line-height: 1.25; color: #cbd5e1; }
 
+  .question-label { font-size: 11.5px; font-weight: 700; color: #38bdf8; margin: 4px 0 4px; }
+
+  /* Snug Option Buttons Pushed Immediately Below Details */
   .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-  button.opt-btn { background: #334155; border: 1.5px solid transparent; color: white; padding: 8px 4px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: 0.1s; }
+  button.opt-btn { background: #334155; border: 1.5px solid transparent; color: white; padding: 7px 4px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.1s; }
   button.opt-btn:active { transform: scale(0.97); }
   button.opt-btn.correct { background: #15803d; border-color: #22c55e; color: #fff; }
   button.opt-btn.wrong { background: #991b1b; border-color: #ef4444; color: #fff; }
 
-  #next-btn { background: #38bdf8; color: #0f172a; font-weight: 800; border: none; padding: 9px; border-radius: 6px; width: 100%; margin-top: 5px; font-size: 13px; cursor: pointer; display: none; }
+  #next-btn { background: #38bdf8; color: #0f172a; font-weight: 800; border: none; padding: 7px; border-radius: 6px; width: 100%; margin-top: 5px; font-size: 12px; cursor: pointer; display: none; }
 
-  /* Bottom Mini Map */
+  /* Expanded Bottom Map Panel */
   #bottom-map-panel {
     flex: 1;
     position: relative;
@@ -72,13 +88,13 @@
     position: absolute;
     top: 6px;
     left: 8px;
-    background: rgba(15, 23, 42, 0.92);
+    background: rgba(15, 23, 42, 0.94);
     color: #38bdf8;
     font-size: 11px;
     font-weight: 800;
-    padding: 3px 7px;
+    padding: 3px 8px;
     border-radius: 5px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
     border: 1px solid rgba(56, 189, 248, 0.4);
     z-index: 10;
     pointer-events: none;
@@ -88,29 +104,25 @@
 <body>
 
   <div id="top-panel">
-    <div>
-      <div class="score-board">
-        <span>🐾 Rescues: <b id="score" style="color:#38bdf8">0</b></span>
-        <span>Mission: <b id="round-tracker">1/20</b></span>
-      </div>
+    <div class="score-bar">
+      <span>🐾 Rescues: <b id="score" style="color:#38bdf8">0</b></span>
+      <span class="badge">URGENT SOS</span>
+      <span>Mission: <b id="round-tracker">1/20</b></span>
+    </div>
 
-      <div class="mission-header">
+    <div class="mission-row">
+      <div class="photo-container">
+        <img id="animal-img" src="" alt="Animal">
+      </div>
+      <div class="details-container">
         <div class="animal-title" id="animal-name">Loading...</div>
-        <div class="badge">URGENT SOS</div>
+        <div class="clue-box" id="mission-clue">Loading Clue...</div>
       </div>
-
-      <div class="large-photo-box">
-        <img id="animal-img" src="" alt="Wild Animal">
-      </div>
-
-      <div class="clue-box" id="mission-clue">Loading Clue...</div>
     </div>
 
-    <div>
-      <div class="question-label" id="step-question">Step 1: Identify Location</div>
-      <div class="options-grid" id="options-box"></div>
-      <button id="next-btn" onclick="nextQuestion()">Next Rescue Mission ➔</button>
-    </div>
+    <div class="question-label" id="step-question">Step 1: Identify Location</div>
+    <div class="options-grid" id="options-box"></div>
+    <button id="next-btn" onclick="nextQuestion()">Next Rescue Mission ➔</button>
   </div>
 
   <div id="bottom-map-panel">
@@ -124,7 +136,7 @@ const missionsDatabase = [
     name: "Snow Leopard",
     country: "Nepal & India",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Snow_leopard_portrait.jpg/800px-Snow_leopard_portrait.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Himalayas,Nepal&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Himalayas,Nepal&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Stranded across high mountain passes in <b>Nepal</b> and <b>India</b>.",
     locationQ: "Identify the mountain range:",
     locations: ["Himalayas", "Andes", "Alps", "Rockies"],
@@ -138,7 +150,7 @@ const missionsDatabase = [
     name: "Ring-Tailed Lemur",
     country: "Madagascar",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Ring-tailed_lemur_%28Lemur_catta%29.jpg/800px-Ring-tailed_lemur_%28Lemur_catta%29.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Madagascar&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Madagascar&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Trapped in spiny forests on the island country of <b>Madagascar</b> off East Africa.",
     locationQ: "Target the destination:",
     locations: ["Madagascar", "Greenland", "Sri Lanka", "New Zealand"],
@@ -152,7 +164,7 @@ const missionsDatabase = [
     name: "Galápagos Penguin",
     country: "Ecuador",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Galapagos_Penguin_%28Spheniscus_mendiculus%29_-Bartolome.jpg/800px-Galapagos_Penguin_%28Spheniscus_mendiculus%29_-Bartolome.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Galapagos+Islands,Ecuador&t=m&z=4&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Galapagos+Islands,Ecuador&t=m&z=3&ie=UTF8&iwloc=&output=embed",
     clue: "Living on volcanic islands governed by <b>Ecuador</b>, right on the Equator.",
     locationQ: "Pinpoint the archipelago:",
     locations: ["Galápagos Islands", "Hawaii", "Iceland", "Maldives"],
@@ -166,7 +178,7 @@ const missionsDatabase = [
     name: "Jaguar",
     country: "Brazil",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Standing_jaguar.jpg/800px-Standing_jaguar.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Amazon+Rainforest,Brazil&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Amazon+Rainforest,Brazil&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Hiding in the tropical rainforest of <b>Brazil</b> along the world's largest river basin.",
     locationQ: "Select the river basin:",
     locations: ["Amazon Basin", "Nile River", "Danube River", "Yangtze River"],
@@ -180,7 +192,7 @@ const missionsDatabase = [
     name: "Giant Panda",
     country: "China",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/800px-Grosser_Panda.JPG",
-    mapEmbed: "https://maps.google.com/maps?q=Sichuan,China&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Sichuan,China&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Munching bamboo in the Sichuan mountain valleys of <b>China</b>.",
     locationQ: "Identify the country:",
     locations: ["China", "India", "Mongolia", "Thailand"],
@@ -194,7 +206,7 @@ const missionsDatabase = [
     name: "Red Kangaroo",
     country: "Australia",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Red_kangaroo_-_melbourne_zoo.jpg/800px-Red_kangaroo_-_melbourne_zoo.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Outback,Australia&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Outback,Australia&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Bounding across the vast desert Outback of <b>Australia</b>.",
     locationQ: "Identify the continent / nation:",
     locations: ["Australia", "Africa", "Europe", "Antarctica"],
@@ -208,7 +220,7 @@ const missionsDatabase = [
     name: "Polar Bear",
     country: "Norway / Svalbard",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Polar_Bear_-_Alaska_%28cropped%29.jpg/800px-Polar_Bear_-_Alaska_%28cropped%29.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Svalbard,Norway&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Svalbard,Norway&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Prowling sea ice near the Svalbard archipelago belonging to <b>Norway</b>.",
     locationQ: "Identify the Arctic region:",
     locations: ["Arctic Ocean / Svalbard", "Sahara", "Amazon", "Gobi Desert"],
@@ -222,7 +234,7 @@ const missionsDatabase = [
     name: "Bengal Tiger",
     country: "India & Bangladesh",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Tiger_in_Ranthambhore.jpg/800px-Tiger_in_Ranthambhore.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Sundarbans,India&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Sundarbans,India&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Swimming through the Sundarbans mangrove forests of <b>India</b> and <b>Bangladesh</b>.",
     locationQ: "Name the mangrove forest:",
     locations: ["Sundarbans", "Black Forest", "Taiga", "Congo Basin"],
@@ -236,7 +248,7 @@ const missionsDatabase = [
     name: "African Elephant",
     country: "Kenya & Tanzania",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/African_Bush_Elephant.jpg/800px-African_Bush_Elephant.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Serengeti,Tanzania&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Serengeti,Tanzania&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Migrating across the Serengeti plains between <b>Kenya</b> and <b>Tanzania</b>.",
     locationQ: "Identify the African biome:",
     locations: ["Savanna", "Tundra", "Taiga", "Glacier"],
@@ -250,7 +262,7 @@ const missionsDatabase = [
     name: "Mountain Gorilla",
     country: "Rwanda & Uganda",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Mountain_Gorilla_%28Gorilla_beringei_beringei%29_male.jpg/800px-Mountain_Gorilla_%28Gorilla_beringei_beringei%29_male.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Virunga+Mountains,Rwanda&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Virunga+Mountains,Rwanda&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Dwelling in the misty Virunga volcanic slopes in <b>Rwanda</b> and <b>Uganda</b>.",
     locationQ: "Target the region:",
     locations: ["Virunga Mountains", "Atlas Mountains", "Urals", "Appalachians"],
@@ -278,7 +290,7 @@ const missionsDatabase = [
     name: "Emperor Penguin",
     country: "Antarctica",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Emperor_Penguin_Manchot_empereur_01.jpg/800px-Emperor_Penguin_Manchot_empereur_01.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Antarctica&t=m&z=2&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Antarctica&t=m&z=1&ie=UTF8&iwloc=&output=embed",
     clue: "Surviving extreme storms on the southern ice shelves of <b>Antarctica</b>.",
     locationQ: "Identify the continent:",
     locations: ["Antarctica", "Europe", "Asia", "South America"],
@@ -292,7 +304,7 @@ const missionsDatabase = [
     name: "Moose",
     country: "Canada",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Moose_superior.jpg/800px-Moose_superior.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Banff,Canada&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Banff,Canada&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Wading in glacial lakes inside the Rocky Mountains of <b>Canada</b>.",
     locationQ: "Identify the country:",
     locations: ["Canada", "Mexico", "Egypt", "Spain"],
@@ -306,7 +318,7 @@ const missionsDatabase = [
     name: "Capybara",
     country: "Brazil & Paraguay",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Capybara_%28Hydrochoerus_hydrochaeris%29.JPG/800px-Capybara_%28Hydrochoerus_hydrochaeris%29.JPG",
-    mapEmbed: "https://maps.google.com/maps?q=Pantanal,Paraguay&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Pantanal,Paraguay&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Lazing in the wetlands connecting <b>Brazil</b>, <b>Paraguay</b>, and <b>Bolivia</b>.",
     locationQ: "Identify the wetland system:",
     locations: ["Pantanal", "Everglades", "Okavango", "Llanos"],
@@ -320,7 +332,7 @@ const missionsDatabase = [
     name: "Orangutan",
     country: "Indonesia & Malaysia",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Orang_Utan%2C_Semenggok_Forest_Reserve%2C_Sarawak%2C_Borneo%2C_Malaysia.JPG/800px-Orang_Utan%2C_Semenggok_Forest_Reserve%2C_Sarawak%2C_Borneo%2C_Malaysia.JPG",
-    mapEmbed: "https://maps.google.com/maps?q=Borneo&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Borneo&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Swinging through rainforest canopies on the island of Borneo in <b>Indonesia</b>.",
     locationQ: "Identify the tropical island:",
     locations: ["Borneo", "Greenland", "Cuba", "Great Britain"],
@@ -334,7 +346,7 @@ const missionsDatabase = [
     name: "Red Fox",
     country: "United Kingdom",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Fox_-_British_Wildlife_Centre_%2817429406401%29.jpg/800px-Fox_-_British_Wildlife_Centre_%2817429406401%29.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=United+Kingdom&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=United+Kingdom&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Foraging through meadows and woodlands across the <b>United Kingdom</b>.",
     locationQ: "Identify the island nation:",
     locations: ["United Kingdom", "Japan", "New Zealand", "Iceland"],
@@ -348,7 +360,7 @@ const missionsDatabase = [
     name: "Arabian Oryx",
     country: "Oman & UAE",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Arabian_oryx_%28Oryx_leucoryx%29_2.jpg/800px-Arabian_oryx_%28Oryx_leucoryx%29_2.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Rub+al+Khali,Oman&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Rub+al+Khali,Oman&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Surviving the Rub' al Khali desert across <b>Oman</b> and <b>UAE</b>.",
     locationQ: "Identify the desert region:",
     locations: ["Arabian Desert", "Gobi Desert", "Atacama Desert", "Mojave Desert"],
@@ -362,7 +374,7 @@ const missionsDatabase = [
     name: "Llama",
     country: "Peru & Bolivia",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Llama_lying_down.jpg/800px-Llama_lying_down.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Cusco,Peru&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Cusco,Peru&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Grazing high on the Altiplano mountains in <b>Peru</b> and <b>Bolivia</b>.",
     locationQ: "Identify the mountain chain:",
     locations: ["Andes Mountains", "Himalayas", "Urals", "Pyrenees"],
@@ -376,7 +388,7 @@ const missionsDatabase = [
     name: "Koala",
     country: "Australia",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Koala_climbing_tree.jpg/800px-Koala_climbing_tree.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Queensland,Australia&t=m&z=3&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Queensland,Australia&t=m&z=2&ie=UTF8&iwloc=&output=embed",
     clue: "Sleeping in eucalyptus trees along the coast of <b>Eastern Australia</b>.",
     locationQ: "Identify the country:",
     locations: ["Australia", "India", "South Africa", "Brazil"],
@@ -390,7 +402,7 @@ const missionsDatabase = [
     name: "Beluga Whale",
     country: "Greenland & Arctic",
     photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Beluga_white_whale_in_aquarium.jpg/800px-Beluga_white_whale_in_aquarium.jpg",
-    mapEmbed: "https://maps.google.com/maps?q=Greenland&t=m&z=2&ie=UTF8&iwloc=&output=embed",
+    mapEmbed: "https://maps.google.com/maps?q=Greenland&t=m&z=1&ie=UTF8&iwloc=&output=embed",
     clue: "Navigating coastal ice channels off <b>Greenland</b> in Arctic waters.",
     locationQ: "Identify the territory:",
     locations: ["Greenland", "Madagascar", "Hawaii", "Cuba"],
@@ -402,7 +414,6 @@ const missionsDatabase = [
   }
 ];
 
-// Fisher-Yates Shuffle for true random order
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -460,7 +471,7 @@ function checkAnswer(chosen, correct, btn) {
   buttons.forEach(b => b.disabled = true);
   if (chosen === correct) {
     btn.classList.add("correct");
-    setTimeout(() => { step = 1; renderStep(); }, 400);
+    setTimeout(() => { step = 1; renderStep(); }, 350);
   } else {
     btn.classList.add("wrong");
     buttons[correct].classList.add("correct");
@@ -479,7 +490,7 @@ function checkGearAnswer(chosen, correct, btn) {
     btn.classList.add("wrong");
     buttons[correct].classList.add("correct");
   }
-  document.getElementById("mission-clue").innerHTML = `🎉 <b>Mission Accomplished!</b><br>${missions[currentIdx].fact}`;
+  document.getElementById("mission-clue").innerHTML = `🎉 <b>Accomplished!</b> ${missions[currentIdx].fact}`;
   document.getElementById("next-btn").style.display = "block";
 }
 
@@ -489,12 +500,12 @@ function nextQuestion() {
     loadMission();
   } else {
     document.getElementById("top-panel").innerHTML = `
-      <div style="text-align:center; padding: 24px 8px;">
-        <div style="font-size: 48px; margin-bottom:8px;">🏆</div>
-        <h2 style="margin:0 0 6px;">Legendary Explorer!</h2>
-        <p style="color:#cbd5e1; font-size:12px;">You successfully completed all 20 global wildlife rescue missions!</p>
-        <p style="font-size:16px; margin: 12px 0;">Final Score: <b style="color:#22c55e">${score} pts</b></p>
-        <button class="opt-btn" onclick="location.reload()" style="width:100%; background:#38bdf8; color:#0f172a; font-weight:800; font-size:13px; padding:10px;">Play Again 🔄</button>
+      <div style="text-align:center; padding: 20px 8px;">
+        <div style="font-size: 40px; margin-bottom:6px;">🏆</div>
+        <h2 style="margin:0 0 4px; font-size:16px;">Legendary Explorer!</h2>
+        <p style="color:#cbd5e1; font-size:11px;">Completed all 20 global wildlife rescue missions!</p>
+        <p style="font-size:14px; margin: 8px 0;">Final Score: <b style="color:#22c55e">${score} pts</b></p>
+        <button class="opt-btn" onclick="location.reload()" style="width:100%; background:#38bdf8; color:#0f172a; font-weight:800; font-size:12px; padding:8px;">Play Again 🔄</button>
       </div>`;
   }
 }
