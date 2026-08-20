@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Geo-Rescue: Wildlife Squad</title>
+<style>
+  * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { margin: 0; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; min-height: 100vh; }
+  #app { width: 100%; max-width: 420px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+  .header { text-align: center; margin-bottom: 12px; }
+  .badge { display: inline-block; background: #22c55e; color: #000; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 13px; }
+  .card { background: #1e293b; border-radius: 16px; padding: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid #334155; }
+  .animal-avatar { font-size: 54px; text-align: center; margin: 10px 0; }
+  .clue-box { background: #0f172a; border-left: 4px solid #38bdf8; padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.5; color: #cbd5e1; }
+  .question-label { font-size: 15px; font-weight: 600; margin: 16px 0 8px; color: #94a3b8; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  button.opt-btn { background: #334155; border: 2px solid transparent; color: white; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+  button.opt-btn:active { transform: scale(0.96); }
+  button.opt-btn.correct { background: #15803d; border-color: #22c55e; }
+  button.opt-btn.wrong { background: #991b1b; border-color: #ef4444; }
+  .score-board { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: 600; font-size: 14px; color: #94a3b8; }
+  #next-btn { background: #38bdf8; color: #0f172a; font-weight: 700; border: none; padding: 14px; border-radius: 12px; width: 100%; margin-top: 15px; font-size: 16px; cursor: pointer; display: none; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div>
+    <div class="score-board">
+      <span>🐾 Rescues: <b id="score" style="color:#38bdf8">0</b></span>
+      <span>Mission: <b id="round-tracker">1/4</b></span>
+    </div>
+    <div class="header">
+      <div class="badge">URGENT SOS SIGNAL</div>
+    </div>
+    <div class="card" id="game-card">
+      <div class="animal-avatar" id="animal-emoji">🐆</div>
+      <h2 id="animal-name" style="margin:0 0 8px; text-align:center;">Snow Leopard</h2>
+      <div class="clue-box" id="mission-clue">
+        Clue goes here.
+      </div>
+      <div class="question-label" id="step-question">Step 1: Identify Location</div>
+      <div class="options-grid" id="options-box"></div>
+      <button id="next-btn" onclick="nextQuestion()">Next Rescue Mission ➔</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const missions = [
+  {
+    name: "Snow Leopard",
+    emoji: "🐆",
+    clue: "Trapped in sub-zero blizzards across the world's highest peaks, spanning China, India, and Nepal.",
+    locationQ: "Where are we deploying?",
+    locations: ["Himalayas", "Andes", "Alps", "Rockies"],
+    correctLoc: 0,
+    gearQ: "Pack proper gear for this biome:",
+    gear: ["Thermal Parka & Crampons", "Scuba Fins & Tank", "Desert Sun Hat", "Jungle Machete"],
+    correctGear: 0,
+    fact: "Awesome! The Himalayas contain Mount Everest and span 5 countries in Asia!"
+  },
+  {
+    name: "Lemur",
+    emoji: "🐒",
+    clue: "Stranded in unique spiny forests on a giant island off the southeast coast of Africa.",
+    locationQ: "Target the destination:",
+    locations: ["Madagascar", "Greenland", "Sri Lanka", "New Zealand"],
+    correctLoc: 0,
+    gearQ: "Select survival essential:",
+    gear: ["Bug Spray & Light Boots", "Heavy Snow Goggles", "Fur Winter Coat", "Ice Pick"],
+    correctGear: 0,
+    fact: "Spot on! Madagascar separated from Africa millions of years ago, so 90% of its wildlife is found nowhere else!"
+  },
+  {
+    name: "Galápagos Penguin",
+    emoji: "🐧",
+    clue: "Only penguin species found north of the equator on volcanic islands in the Pacific Ocean.",
+    locationQ: "Pinpoint the archipelago:",
+    locations: ["Galápagos Islands", "Hawaii", "Iceland", "Maldives"],
+    correctLoc: 0,
+    gearQ: "Gear needed for marine rescue:",
+    gear: ["Snorkel & Reef Boots", "Snowmobile", "Sand Gaiters", "Down Jacket"],
+    correctGear: 0,
+    fact: "Brilliant! The Galápagos belong to Ecuador and sit right across the Equator line."
+  },
+  {
+    name: "Jaguar",
+    emoji: "🐆",
+    clue: "Hiding along the world's largest river basin by discharge, deep in the South American tropical rainforest.",
+    locationQ: "Select the river basin:",
+    locations: ["Amazon Basin", "Nile River", "Danube River", "Yangtze River"],
+    correctLoc: 0,
+    gearQ: "Choose river expedition gear:",
+    gear: ["Waterproof Raft & Compass", "Ice Sled", "Snowshoes", "Camel Saddle"],
+    correctGear: 0,
+    fact: "Mission accomplished! The Amazon river runs through 9 South American nations."
+  }
+];
+
+let currentIdx = 0;
+let step = 0; // 0 = location, 1 = gear
+let score = 0;
+
+function loadMission() {
+  const m = missions[currentIdx];
+  document.getElementById("animal-emoji").innerText = m.emoji;
+  document.getElementById("animal-name").innerText = m.name;
+  document.getElementById("mission-clue").innerText = m.clue;
+  document.getElementById("round-tracker").innerText = `${currentIdx + 1}/${missions.length}`;
+  document.getElementById("next-btn").style.display = "none";
+  step = 0;
+  renderStep();
+}
+
+function renderStep() {
+  const m = missions[currentIdx];
+  const box = document.getElementById("options-box");
+  box.innerHTML = "";
+  
+  if (step === 0) {
+    document.getElementById("step-question").innerText = `Step 1: ${m.locationQ}`;
+    m.locations.forEach((loc, i) => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn";
+      btn.innerText = loc;
+      btn.onclick = () => checkAnswer(i, m.correctLoc, btn);
+      box.appendChild(btn);
+    });
+  } else {
+    document.getElementById("step-question").innerText = `Step 2: ${m.gearQ}`;
+    m.gear.forEach((g, i) => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn";
+      btn.innerText = g;
+      btn.onclick = () => checkGearAnswer(i, m.correctGear, btn);
+      box.appendChild(btn);
+    });
+  }
+}
+
+function checkAnswer(chosen, correct, btn) {
+  const buttons = document.querySelectorAll(".opt-btn");
+  buttons.forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    btn.classList.add("correct");
+    setTimeout(() => { step = 1; renderStep(); }, 700);
+  } else {
+    btn.classList.add("wrong");
+    buttons[correct].classList.add("correct");
+    setTimeout(() => { step = 1; renderStep(); }, 1200);
+  }
+}
+
+function checkGearAnswer(chosen, correct, btn) {
+  const buttons = document.querySelectorAll(".opt-btn");
+  buttons.forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    btn.classList.add("correct");
+    score += 100;
+    document.getElementById("score").innerText = score;
+  } else {
+    btn.classList.add("wrong");
+    buttons[correct].classList.add("correct");
+  }
+  document.getElementById("mission-clue").innerHTML = `🎉 <b>Mission Success!</b><br>${missions[currentIdx].fact}`;
+  document.getElementById("next-btn").style.display = "block";
+}
+
+function nextQuestion() {
+  currentIdx++;
+  if (currentIdx < missions.length) {
+    loadMission();
+  } else {
+    document.getElementById("game-card").innerHTML = `
+      <div style="text-align:center; padding: 20px;">
+        <div style="font-size: 60px;">🏆</div>
+        <h2>Master Explorer!</h2>
+        <p style="color:#cbd5e1">All endangered wildlife rescued! Final Score: <b style="color:#22c55e">${score} pts</b></p>
+        <button class="opt-btn" onclick="location.reload()" style="width:100%; margin-top:20px; background:#38bdf8; color:#000;">Play Again</button>
+      </div>`;
+  }
+}
+
+loadMission();
+</script>
+</body>
+</html>
